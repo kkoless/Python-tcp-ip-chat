@@ -49,28 +49,9 @@ def receive():
         broadcast(f"{nickname} connected to the server!\n".encode("utf-8"))
         client.send("Connected to the server\n".encode("utf-8"))
 
-        thread = threading.Thread(target=handle, args=(client, ))
+        thread = threading.Thread(target=handle, args=(client,))
         thread.start()
 
 
 print("Server is running...")
 receive()
-
-
-
-# while not flag:
-#     try:
-#         data, address = server.recvfrom(1024)
-#         if address not in clients:
-#             clients.append(address)
-#
-#         print(f"[{address[0]}] --- [{str(address[1])}]  //  ", end="")
-#         print(data.decode("utf-8"))
-#
-#         for client in clients:
-#             if address != client:
-#                 server.sendto(data, client)
-#     except:
-#         print("\nServer stopped!")
-#         flag = True
-
