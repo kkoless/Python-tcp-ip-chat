@@ -1,9 +1,10 @@
-import socket, threading
+import socket
+import threading
 import tkinter
 import tkinter.scrolledtext
 from tkinter import simpledialog
 
-HOST = "127.0.0.1"
+HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9090
 
 
@@ -15,7 +16,7 @@ class Client:
         msg = tkinter.Tk()
         msg.withdraw()
 
-        self.nickname = simpledialog.askstring("Nickname", "Please choose a nickaname", parent=msg)
+        self.nickname = simpledialog.askstring("Nickname", "Please choose a nickname", parent=msg)
 
         self.gui_done = False
         self.running = True
@@ -38,6 +39,10 @@ class Client:
         self.text_area.pack(padx=20, pady=5)
         self.text_area.config(state="disabled")
 
+        self.clients_area = tkinter.Text(self.win, height=3)
+        self.clients_area.pack(padx=20, pady=5)
+        self.clients_area.config(state="disabled")
+
         self.msg_label = tkinter.Label(self.win, text="Message:", bg="lightgray")
         self.msg_label.config(font=("Arial", 12))
         self.msg_label.pack(padx=20, pady=5)
@@ -57,8 +62,9 @@ class Client:
 
     def write(self):
         message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
-        self.sock.send(message.encode("utf-8"))
+        self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
+        self.clients_area.delete('1.0', 'end')
 
     def stop(self):
         self.running = False
@@ -68,33 +74,30 @@ class Client:
 
     def receive(self):
         while self.running:
-            try:
-                message = self.sock.recv(1024).decode("utf-8")
-                if message == 'NICK':
-                    self.sock.send(self.nickname.encode('utf-8'))
-                else:
-                    if self.gui_done:
+            if self.gui_done:
+                try:
+                    message = self.sock.recv(1024).decode("utf-8")
+                    if message == 'NICK':
+                        self.sock.send(self.nickname.encode('utf-8'))
+                    elif '[USERS]' in message:
+                        msg = "\n".join(message)
+                        self.clients_area.config(state="normal")
+                        self.clients_area.delete('1.0', 'end')
+                        self.clients_area.insert('end', message)
+                        self.clients_area.yview('end')
+                        self.clients_area.config(state="disabled")
+                    else:
                         self.text_area.config(state="normal")
                         self.text_area.insert('end', message)
                         self.text_area.yview('end')
                         self.text_area.config(state="disabled")
-            except ConnectionAbortedError:
-                break
-            except:
-                print("Error")
-                self.sock.close()
-                break
+                except ConnectionAbortedError:
+                    break
+                except:
+                    print("Error")
+                    self.sock.close()
+                    break
 
 
 client = Client(HOST, PORT)
-
-
-
-
-
-
-
-
-
-
 
