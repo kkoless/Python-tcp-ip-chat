@@ -4,6 +4,7 @@ import tkinter
 import tkinter.scrolledtext
 from tkinter import simpledialog
 
+
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9090
 
@@ -29,30 +30,28 @@ class Client:
 
     def gui_loop(self):
         self.win = tkinter.Tk()
-        self.win.configure(bg="lightgray")
+        self.win.title("CHAT")
+        self.win.configure(bg="snow")
 
-        self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
-        self.chat_label.config(font=("Arial", 12))
-        self.chat_label.pack(padx=20, pady=5)
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win, width=50, bg="snow")
+        self.text_area.grid(column=0, row=1, padx=5, pady=5, sticky="nw")
+        self.text_area.config(state="disabled", font=('Calibri', 16,))
 
-        self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
-        self.text_area.pack(padx=20, pady=5)
-        self.text_area.config(state="disabled")
+        self.clients_area = tkinter.Text(self.win, width=13, bg="snow")
+        self.clients_area.grid(column=1, row=0, rowspan=5, padx=5, pady=5, sticky="ns")
+        self.clients_area.config(state="disabled", font=('Calibri', 16))
 
-        self.clients_area = tkinter.Text(self.win, height=3)
-        self.clients_area.pack(padx=20, pady=5)
-        self.clients_area.config(state="disabled")
+        self.msg_label = tkinter.Label(self.win, text="Сообщение:", bg="snow")
+        self.msg_label.config(font=('Calibri', 18, "bold"))
+        self.msg_label.grid(column=0, row=2, padx=5, pady=5, sticky="w")
 
-        self.msg_label = tkinter.Label(self.win, text="Message:", bg="lightgray")
-        self.msg_label.config(font=("Arial", 12))
-        self.msg_label.pack(padx=20, pady=5)
+        self.input_area = tkinter.Text(self.win, width=55, height=5, bg="snow")
+        self.input_area.config(font=('Calibri', 15))
+        self.input_area.grid(column=0, row=3, padx=5, pady=5, sticky="sw")
 
-        self.input_area = tkinter.Text(self.win, height=3)
-        self.input_area.pack(padx=20, pady=5)
-
-        self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
-        self.send_button.config(font=("Arial", 12))
-        self.send_button.pack(padx=20, pady=5)
+        self.send_button = tkinter.Button(self.win, text="Отправить", command=self.write)
+        self.send_button.config(font=('Calibri', 14))
+        self.send_button.grid(column=0, row=4, padx=5, pady=5, sticky="s")
 
         self.gui_done = True
 
@@ -80,10 +79,10 @@ class Client:
                     if message == 'NICK':
                         self.sock.send(self.nickname.encode('utf-8'))
                     elif '[USERS]' in message:
-                        msg = "\n".join(message)
+                        clients_list = message[7:]
                         self.clients_area.config(state="normal")
                         self.clients_area.delete('1.0', 'end')
-                        self.clients_area.insert('end', message)
+                        self.clients_area.insert('end', clients_list)
                         self.clients_area.yview('end')
                         self.clients_area.config(state="disabled")
                     else:
@@ -100,4 +99,3 @@ class Client:
 
 
 client = Client(HOST, PORT)
-

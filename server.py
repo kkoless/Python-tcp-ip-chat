@@ -13,16 +13,17 @@ nicknames = []
 
 
 def broadcast(message):
+    nicknames_list = '\n'.join(nicknames)
     for client in clients:
         client.send(message)
-        client.send(f"[USERS]{str(nicknames)}".encode("utf-8"))
+        client.send(f'[USERS]{nicknames_list}'.encode("utf-8"))
 
 
 def handle(client):
     while True:
         try:
             message = client.recv(1024)
-            print(f"{nicknames[clients.index(client)]} says {message}")
+            print(f"{nicknames[clients.index(client)]} сказал: {message}")
             broadcast(message)
         except:
             index = clients.index(client)
@@ -30,15 +31,14 @@ def handle(client):
             nicknames.remove(nickname)
             clients.remove(client)
             client.close()
-            broadcast(f"{nickname} left chat!\n".encode("utf-8"))
+            broadcast(f"{nickname} покинул сервер!\n".encode("utf-8"))
             break
 
 
 def receive():
     while True:
         client, address = server.accept()
-        print(address)
-        print(f"Connected with {str(address)}")
+        print(f"Соединение с {str(address)}")
 
         client.send("NICK".encode("utf-8"))
         nickname = client.recv(1024).decode("utf-8")
@@ -46,8 +46,8 @@ def receive():
         nicknames.append(nickname)
         clients.append(client)
 
-        print(f"Nickname of the client is {nickname}")
-        broadcast(f"{nickname} connected to the server!\n".encode("utf-8"))
+        print(f"Никнейм клиента: {nickname}")
+        broadcast(f"{nickname} подключился к серверу!\n".encode("utf-8"))
 
         thread = threading.Thread(target=handle, args=(client, ))
         thread.start()
@@ -55,4 +55,3 @@ def receive():
 
 print("Server is running...")
 receive()
-
