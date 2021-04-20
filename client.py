@@ -8,6 +8,8 @@ from tkinter import simpledialog
 HOST = socket.gethostbyname(socket.gethostname())
 PORT = 9090
 
+key = 7943
+
 
 class Client:
     def __init__(self, host, port):
@@ -33,25 +35,32 @@ class Client:
         self.win.title("CHAT")
         self.win.configure(bg="snow")
 
+        self.win.columnconfigure(0, weight=1)
+        self.win.rowconfigure(1, weight=1)
+
+        self.text_area_label = tkinter.Label(self.win, text="Чат:", bg="snow")
+        self.text_area_label.config(font=('Calibri', 18, "bold"))
+        self.text_area_label.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win, width=50, bg="snow")
-        self.text_area.grid(column=0, row=1, padx=5, pady=5, sticky="nw")
+        self.text_area.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
         self.text_area.config(state="disabled", font=('Calibri', 16,))
 
         self.clients_area = tkinter.Text(self.win, width=13, bg="snow")
-        self.clients_area.grid(column=1, row=0, rowspan=5, padx=5, pady=5, sticky="ns")
+        self.clients_area.grid(column=1, row=0, rowspan=5, padx=5, pady=5, sticky='nsew')
         self.clients_area.config(state="disabled", font=('Calibri', 16))
 
         self.msg_label = tkinter.Label(self.win, text="Сообщение:", bg="snow")
         self.msg_label.config(font=('Calibri', 18, "bold"))
-        self.msg_label.grid(column=0, row=2, padx=5, pady=5, sticky="w")
+        self.msg_label.grid(column=0, row=2, padx=5, pady=5, sticky='nsew')
 
         self.input_area = tkinter.Text(self.win, width=55, height=5, bg="snow")
         self.input_area.config(font=('Calibri', 15))
-        self.input_area.grid(column=0, row=3, padx=5, pady=5, sticky="sw")
+        self.input_area.grid(column=0, row=3, padx=5, pady=5, sticky='nsew')
 
         self.send_button = tkinter.Button(self.win, text="Отправить", command=self.write)
         self.send_button.config(font=('Calibri', 14))
-        self.send_button.grid(column=0, row=4, padx=5, pady=5, sticky="s")
+        self.send_button.grid(column=0, row=4, padx=5, pady=5, sticky='nsew')
 
         self.gui_done = True
 
@@ -60,10 +69,18 @@ class Client:
         self.win.mainloop()
 
     def write(self):
-        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
-        self.sock.send(message.encode('utf-8'))
-        self.input_area.delete('1.0', 'end')
-        self.clients_area.delete('1.0', 'end')
+        message = self.input_area.get('1.0', 'end')
+
+        crypt = ""
+        for i in message:
+            crypt += chr(ord(i) ^ key)
+
+        crypt_message = f"{self.nickname}: {crypt}"
+
+        if self.input_area.get('1.0', 'end-1c') != "":
+            self.sock.send(crypt_message.encode('utf-8'))
+            self.input_area.delete('1.0', 'end')
+            self.clients_area.delete('1.0', 'end')
 
     def stop(self):
         self.running = False
@@ -86,8 +103,20 @@ class Client:
                         self.clients_area.yview('end')
                         self.clients_area.config(state="disabled")
                     else:
+                        decrypt_message = ""
+                        k = False
+                        for i in message:
+                            if i == ":":
+                                k = True
+                                decrypt_message += i
+                            elif k == False or i == " ":
+                                decrypt_message += i
+                            else:
+                                decrypt_message += chr(ord(i) ^ key)
+
                         self.text_area.config(state="normal")
-                        self.text_area.insert('end', message)
+
+                        self.text_area.insert('end', decrypt_message)
                         self.text_area.yview('end')
                         self.text_area.config(state="disabled")
                 except ConnectionAbortedError:
@@ -95,6 +124,7 @@ class Client:
                 except:
                     print("Error")
                     self.sock.close()
+                    self.stop()
                     break
 
 
