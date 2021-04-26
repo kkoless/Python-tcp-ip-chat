@@ -40,12 +40,16 @@ class Client:
         self.win.columnconfigure(0, weight=1)
         self.win.rowconfigure(1, weight=1)
 
+        self.nickname_label = tkinter.Label(self.win, text="Ваш никнейм: " + self.nickname, bg="snow")
+        self.nickname_label.config(font=('Calibri', 16, "bold"))
+        self.nickname_label.grid(column=0, row=0, padx=2, pady=2, sticky='nsew')
+
         self.text_area_label = tkinter.Label(self.win, text="Чат:", bg="snow")
         self.text_area_label.config(font=('Calibri', 16, "bold"))
-        self.text_area_label.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+        self.text_area_label.grid(column=0, row=1, padx=2, pady=2, sticky='nsew')
 
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win, width=50, bg="snow")
-        self.text_area.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
+        self.text_area.grid(column=0, row=2, padx=5, pady=5, sticky='nsew')
         self.text_area.config(state="disabled", font=('Calibri', 16,))
 
         self.ca_label = tkinter.Label(self.win, text="Сейчас онлайн:", bg="snow")
@@ -58,15 +62,15 @@ class Client:
 
         self.msg_label = tkinter.Label(self.win, text="Сообщение:", bg="snow")
         self.msg_label.config(font=('Calibri', 18, "bold"))
-        self.msg_label.grid(column=0, row=2, padx=5, pady=5, sticky='nsew')
+        self.msg_label.grid(column=0, row=3, padx=5, pady=5, sticky='nsew')
 
         self.input_area = tkinter.Text(self.win, width=55, height=5, bg="snow")
         self.input_area.config(font=('Calibri', 15))
-        self.input_area.grid(column=0, row=3, padx=5, pady=5, sticky='nsew')
+        self.input_area.grid(column=0, row=4, padx=5, pady=5, sticky='nsew')
 
         self.send_button = tkinter.Button(self.win, text="Отправить", command=self.write)
         self.send_button.config(font=('Calibri', 14))
-        self.send_button.grid(column=0, row=4, padx=5, pady=5, sticky='nsew')
+        self.send_button.grid(column=0, row=5, padx=5, pady=5, sticky='nsew')
 
         self.gui_done = True
 
