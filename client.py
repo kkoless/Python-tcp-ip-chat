@@ -41,15 +41,19 @@ class Client:
         self.win.rowconfigure(1, weight=1)
 
         self.text_area_label = tkinter.Label(self.win, text="Чат:", bg="snow")
-        self.text_area_label.config(font=('Calibri', 18, "bold"))
+        self.text_area_label.config(font=('Calibri', 16, "bold"))
         self.text_area_label.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
 
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win, width=50, bg="snow")
         self.text_area.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
         self.text_area.config(state="disabled", font=('Calibri', 16,))
 
-        self.clients_area = tkinter.Text(self.win, width=13, bg="snow")
-        self.clients_area.grid(column=1, row=0, rowspan=5, padx=5, pady=5, sticky='nsew')
+        self.ca_label = tkinter.Label(self.win, text="Сейчас онлайн:", bg="snow")
+        self.ca_label.config(font=('Calibri', 16, "bold"))
+        self.ca_label.grid(column=1, row=0, padx=5, pady=5, sticky='nsew')
+
+        self.clients_area = tkinter.Text(self.win, width=20, bg="snow")
+        self.clients_area.grid(column=1, row=1, rowspan=5, padx=5, pady=5, sticky='nsew')
         self.clients_area.config(state="disabled", font=('Calibri', 16))
 
         self.msg_label = tkinter.Label(self.win, text="Сообщение:", bg="snow")
